@@ -1,6 +1,6 @@
 # SPEC 01 — Feed como home estática
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** —
 > **Date:** 2026-09-04
 > **Objective:** Implementar la plantilla `references/pantallas/feed.dc.html` como home `/` con datos hardcodeados y estilo idéntico al mockup, sin autenticación ni base de datos.
@@ -59,14 +59,14 @@ Los nombres de tipos, propiedades, identificadores y valores internos están en 
 
 ## Criterios de aceptación
 
-- [ ] `/` renderiza sin errores.
-- [ ] Desktop replica la estructura, colores, tipografías, radios y espaciados del mockup.
-- [ ] Aparecen los tres posts con badges y contadores correctos.
-- [ ] El copy coincide con el mockup.
-- [ ] En viewport menor a 768px aparece el bottom nav y desaparece el sidebar.
-- [ ] Fredoka y Nunito se cargan con `next/font/google`.
-- [ ] Los elementos permanecen visuales e inertes.
-- [ ] `pnpm lint` y `pnpm build` pasan.
+- [x] `/` renderiza sin errores.
+- [x] Desktop replica la estructura, colores, tipografías, radios y espaciados del mockup.
+- [x] Aparecen los tres posts con badges y contadores correctos.
+- [x] El copy coincide con el mockup.
+- [x] En viewport menor a 768px aparece el bottom nav y desaparece el sidebar.
+- [x] Fredoka y Nunito se cargan con `next/font/google`.
+- [x] Los elementos permanecen visuales e inertes.
+- [x] `pnpm lint` y `pnpm build` pasan.
 
 ## Decisiones
 

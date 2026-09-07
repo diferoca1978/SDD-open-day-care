@@ -14,14 +14,14 @@ export function FeedPost({ post }: { post: FeedPost }) {
   return (
     <article className="rounded-[20px] border border-[#ECE0D0] bg-[#FFFDF9] px-[22px] py-5 shadow-[0_4px_16px_-12px_rgba(120,90,60,.5)]">
       <header className="mb-[14px] flex items-center gap-3">
-        <span className={`flex h-11 w-11 flex-none items-center justify-center rounded-full font-heading text-[17px] font-600 ${style.avatar}`}>
+        <span className={`flex h-11 w-11 flex-none items-center justify-center rounded-full font-heading text-[17px] font-semibold ${style.avatar}`}>
           {isAnnouncement ? <MegaphoneIcon size={20} /> : post.childName?.[0]}
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block font-heading text-[16.5px] font-600 text-[#3F362E]">{isAnnouncement ? "Anuncio general" : post.childName}</span>
-          <span className="block text-[12.5px] text-[#A89A8B]">{post.time} · publicado por {post.publishedBy}</span>
+          <span className="block font-heading text-[16.5px] font-semibold text-[#3F362E]">{isAnnouncement ? "Anuncio general" : post.childName}</span>
+          <span className="block text-[12.5px] text-[#A89A8B]">{post.time} · publicado por vos</span>
         </span>
-        <span className={`flex items-center gap-[7px] rounded-full px-3 py-1.5 text-[12px] font-800 tracking-[.5px] ${style.badge}`}>
+        <span className={`flex items-center gap-[7px] rounded-full px-3 py-1.5 text-[12px] font-extrabold tracking-[.5px] ${style.badge}`}>
           <span className={`h-2 w-2 rounded-full ${style.dot}`} />
           {style.label}
         </span>
@@ -35,10 +35,10 @@ export function FeedPost({ post }: { post: FeedPost }) {
         </div>
       )}
       <footer className="mt-4 flex items-center gap-[18px] border-t border-[#F0E6D8] pt-3.5">
-        <span className="flex items-center gap-[7px] text-sm font-700 text-[#E0654A]"><HeartIcon filled size={19} />{post.hearts}</span>
-        <span className="flex items-center gap-[7px] text-sm font-700 text-[#94887B]"><CommentIcon size={18} />{post.comments}</span>
+        <span className="flex items-center gap-[7px] text-sm font-bold text-[#E0654A]"><HeartIcon filled size={19} />{post.hearts}</span>
+        <span className="flex items-center gap-[7px] text-sm font-bold text-[#94887B]"><CommentIcon size={18} />{post.comments}</span>
         <span className="flex-1" />
-        <a className="text-sm font-800 text-[#C5503A]" href="#">Editar</a>
+        <a className="text-sm font-extrabold text-[#C5503A]" href="#">Editar</a>
       </footer>
     </article>
   );

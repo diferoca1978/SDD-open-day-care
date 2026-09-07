@@ -4,7 +4,6 @@ export type FeedPost = {
   id: string;
   kind: PostKind;
   childName?: string;
-  publishedBy: string;
   time: string;
   audience: string;
   body: string;
@@ -30,7 +29,6 @@ export const posts: FeedPost[] = [
     id: "mateo-achievement",
     kind: "achievement",
     childName: "Mateo",
-    publishedBy: "vos",
     time: "14:20",
     audience: "familia de Mateo",
     body: "¡Usó el orinal solito por primera vez! Estaba feliz de contárselo a todos. Un gran paso.",
@@ -41,7 +39,6 @@ export const posts: FeedPost[] = [
     id: "mateo-activity",
     kind: "activity",
     childName: "Mateo",
-    publishedBy: "vos",
     time: "09:40",
     audience: "familia de Mateo",
     body: "Pintamos con témperas esta mañana. Mateo eligió el azul para todo y se concentró un montón mezclando colores.",
@@ -52,7 +49,6 @@ export const posts: FeedPost[] = [
   {
     id: "park-announcement",
     kind: "announcement",
-    publishedBy: "vos",
     time: "07:50",
     audience: "toda la sala",
     body: "El viernes salimos al parque por la mañana. Recuerden mandar gorra y una botellita de agua.",
