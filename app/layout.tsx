@@ -5,12 +5,14 @@ import "./globals.css";
 const fredoka = Fredoka({
   variable: "--font-display",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const nunito = Nunito({
   variable: "--font-body",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {

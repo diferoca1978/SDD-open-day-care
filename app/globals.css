@@ -14,9 +14,13 @@
   --color-surface: #fffdf9;
   --color-line: #ece0d0;
   --color-coral: #f2937a;
+  --color-coral-soft: #fbe3d8;
   --color-coral-dark: #d9583c;
   --color-ink: #3f362e;
+  --color-ink-soft: #4a4038;
   --color-muted: #94887b;
+  --color-muted-light: #a89a8b;
+  --color-divider: #e7dac8;
 }
 
 * {
@@ -24,6 +28,7 @@
 }
 
 body {
+  margin: 0;
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-body), system-ui, sans-serif;
