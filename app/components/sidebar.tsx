@@ -1,34 +1,36 @@
+import Link from "next/link";
 import { currentUser } from "@/app/data/mock-feed";
 import { BellIcon, HomeIcon, LogoutIcon, PeopleIcon, PlusIcon, SunIcon, UserIcon } from "@/app/components/icons";
 
 const navItems = [
-  { label: "Feed", icon: HomeIcon },
-  { label: "Niños", icon: PeopleIcon },
-  { label: "Avisos", icon: BellIcon },
-  { label: "Mi cuenta", icon: UserIcon },
+  { id: "feed", label: "Feed", icon: HomeIcon, href: "/" },
+  { id: "kids", label: "Niños", icon: PeopleIcon, href: "/kids" },
+  { id: "avisos", label: "Avisos", icon: BellIcon, href: "#" },
+  { id: "cuenta", label: "Mi cuenta", icon: UserIcon, href: "#" },
 ];
 
-function Navigation({ mobile = false }: { mobile?: boolean }) {
+type NavItemId = (typeof navItems)[number]["id"];
+
+function Navigation({ mobile = false, activeItem }: { mobile?: boolean; activeItem: NavItemId }) {
   return (
     <nav className={mobile ? "flex w-full items-center justify-around" : "flex flex-1 flex-col gap-1"}>
-      {navItems.map(({ label, icon: ItemIcon }, index) => (
-        <a
-          aria-current={index === 0 ? "page" : undefined}
-          className={mobile
-            ? `flex flex-col items-center gap-1 rounded-xl px-3 py-2 text-[10px] font-bold ${index === 0 ? "text-[#D9583C]" : "text-[#8A7C6D]"}`
-            : `flex items-center gap-3 rounded-xl px-3 py-[11px] text-[14.5px] ${index === 0 ? "bg-[#FBE3D8] font-extrabold text-[#D9583C]" : "font-semibold text-[#6E6359]"}`}
-          href="#"
-          key={label}
-        >
-          <ItemIcon size={mobile ? 20 : 19} />
-          <span>{label}</span>
-        </a>
-      ))}
+      {navItems.map(({ id, label, icon: ItemIcon, href }) => {
+        const isActive = id === activeItem;
+        const className = mobile
+          ? `flex flex-col items-center gap-1 rounded-xl px-3 py-2 text-[10px] font-bold ${isActive ? "text-[#D9583C]" : "text-[#8A7C6D]"}`
+          : `flex items-center gap-3 rounded-xl px-3 py-[11px] text-[14.5px] ${isActive ? "bg-[#FBE3D8] font-extrabold text-[#D9583C]" : "font-semibold text-[#6E6359]"}`;
+        const itemContent = (<><ItemIcon size={mobile ? 20 : 19} /><span>{label}</span></>);
+        return href.startsWith("/") ? (
+          <Link aria-current={isActive ? "page" : undefined} className={className} href={href} key={id}>{itemContent}</Link>
+        ) : (
+          <a aria-current={isActive ? "page" : undefined} className={className} href={href} key={id}>{itemContent}</a>
+        );
+      })}
     </nav>
   );
 }
 
-export function Sidebar() {
+export function Sidebar({ activeItem }: { activeItem: NavItemId }) {
   return (
     <>
       <aside className="sticky top-0 hidden h-screen w-[248px] flex-none flex-col border-r border-[#ECE0D0] bg-[#FFFDF9] px-4 py-6 md:flex">
@@ -45,7 +47,7 @@ export function Sidebar() {
           <PlusIcon size={17} />
           Nueva publicación
         </a>
-        <Navigation />
+        <Navigation activeItem={activeItem} />
         <div className="mt-[10px] border-t border-[#ECE0D0] pt-[14px]">
           <div className="flex items-center gap-[11px] px-2 py-1.5">
             <span className="flex h-[38px] w-[38px] flex-none items-center justify-center rounded-full bg-[#F2937A] font-heading text-base font-semibold text-white">{currentUser.initial}</span>
@@ -58,7 +60,7 @@ export function Sidebar() {
         </div>
       </aside>
       <div className="fixed inset-x-0 bottom-0 z-20 border-t border-[#ECE0D0] bg-[#FFFDF9]/95 px-2 pb-[max(8px,env(safe-area-inset-bottom))] pt-1.5 shadow-[0_-4px_16px_-12px_rgba(120,90,60,.5)] backdrop-blur md:hidden">
-        <Navigation mobile />
+        <Navigation mobile activeItem={activeItem} />
       </div>
     </>
   );

@@ -6,7 +6,7 @@ import { currentUser, posts, room } from "@/app/data/mock-feed";
 export default function Home() {
   return (
     <div className="flex min-h-screen bg-[#F6ECDF]">
-      <Sidebar />
+      <Sidebar activeItem="feed" />
       <main className="min-w-0 flex-1 overflow-y-auto">
         <div className="mx-auto w-full max-w-[760px] px-5 pb-24 pt-[34px] sm:px-10 sm:pb-20">
           <header className="mb-6">
