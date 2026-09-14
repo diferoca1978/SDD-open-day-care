@@ -47,17 +47,17 @@ El estado del formulario (valores y errores) es local al componente del diálogo
 
 ## Criterios de aceptación
 
-- [ ] El botón "Agregar niño" abre el diálogo sobre `/kids` sin navegación.
-- [ ] El diálogo replica estructura, colores, tipografías, radios y copy del mockup (cabecera y los cinco campos).
-- [ ] Cancelar, Esc y clic en el overlay cierran el diálogo sin efectos.
-- [ ] Guardar con nombre o fecha vacíos muestra errores inline y mantiene el diálogo abierto.
-- [ ] Guardar con fecha futura muestra error inline.
-- [ ] Guardar con los campos obligatorios completos cierra el diálogo y la grilla sigue mostrando exactamente los 8 niños del mock.
-- [ ] La fecha usa picker nativo y la sala ofrece Soles (por defecto), Lunas y Estrellas.
-- [ ] Alergias y notas médicas aceptan quedarse vacías sin errores.
-- [ ] En viewport menor a 768px el diálogo se ajusta sin scroll horizontal.
-- [ ] `/`, `/kids/[id]`, `/login` y `/activate` quedan intactas.
-- [ ] `pnpm lint` y `pnpm build` pasan.
+- [x] El botón "Agregar niño" abre el diálogo sobre `/kids` sin navegación.
+- [x] El diálogo replica estructura, colores, tipografías, radios y copy del mockup (cabecera y los cinco campos).
+- [x] Cancelar, Esc y clic en el overlay cierran el diálogo sin efectos.
+- [x] Guardar con nombre o fecha vacíos muestra errores inline y mantiene el diálogo abierto.
+- [x] Guardar con fecha futura muestra error inline.
+- [x] Guardar con los campos obligatorios completos cierra el diálogo y la grilla sigue mostrando exactamente los 8 niños del mock.
+- [x] La fecha usa picker nativo y la sala ofrece Soles (por defecto), Lunas y Estrellas.
+- [x] Alergias y notas médicas aceptan quedarse vacías sin errores.
+- [x] En viewport menor a 768px el diálogo se ajusta sin scroll horizontal.
+- [x] `/`, `/kids/[id]`, `/login` y `/activate` quedan intactas.
+- [x] `pnpm lint` y `pnpm build` pasan.
 
 ## Decisiones
 
