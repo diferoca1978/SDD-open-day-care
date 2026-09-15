@@ -43,6 +43,18 @@ export function PlusIcon({ size, className }: IconProps) {
   return <Icon size={size} className={className}><path d="M12 5v14M5 12h14" {...stroke} /></Icon>;
 }
 
+export function XIcon({ size, className }: IconProps) {
+  return <Icon size={size} className={className}><path d="M18 6 6 18M6 6l12 12" {...strokeBold} /></Icon>;
+}
+
+export function InfoIcon({ size, className }: IconProps) {
+  return <Icon size={size} className={className}><circle cx="12" cy="12" r="10" {...stroke} /><path d="M12 16v-4M12 8h.01" {...stroke} /></Icon>;
+}
+
+export function SendIcon({ size, className }: IconProps) {
+  return <Icon size={size} className={className}><path d="m22 2-7 20-4-9-9-4zM22 2 11 13" {...stroke} /></Icon>;
+}
+
 export function CameraIcon({ size, className }: IconProps) {
   return <Icon size={size} className={className}><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" {...stroke} /><circle cx="12" cy="13" r="4" {...stroke} /></Icon>;
 }

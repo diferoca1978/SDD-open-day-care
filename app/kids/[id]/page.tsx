@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { AlertIcon, ChevronLeftIcon, PlusIcon, SunIcon } from "@/app/components/icons";
+import { LinkParentDialog } from "@/app/components/link-parent-dialog";
+import { AlertIcon, ChevronLeftIcon, SunIcon } from "@/app/components/icons";
 import { Sidebar } from "@/app/components/sidebar";
 import { kids } from "@/app/data/mock-kids";
 import type { ParentStatus } from "@/app/data/mock-kids";
@@ -97,12 +98,7 @@ export default async function KidProfilePage({ params }: PageProps<"/kids/[id]">
                       </div>
                     );
                   })}
-                  <a className="flex items-center gap-3 pt-2" href="#">
-                    <span className="flex h-10 w-10 flex-none items-center justify-center rounded-full border-[1.5px] border-dashed border-[#D8CBBA] text-[#B0A290]">
-                      <PlusIcon size={18} />
-                    </span>
-                    <span className="text-[14.5px] font-extrabold text-[#C5503A]">Vincular otro padre</span>
-                  </a>
+                  <LinkParentDialog kidName={kid.name} />
                 </div>
               </div>
             </div>
