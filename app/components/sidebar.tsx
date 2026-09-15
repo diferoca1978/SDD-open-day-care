@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { currentUser } from "@/app/data/mock-feed";
-import { BellIcon, HomeIcon, LogoutIcon, PeopleIcon, PlusIcon, SunIcon, UserIcon } from "@/app/components/icons";
+import { BellIcon, HomeIcon, LogoutIcon, PeopleIcon, SunIcon, UserIcon } from "@/app/components/icons";
+import { NewPostButton } from "@/app/components/create-post-dialog";
 
 const navItems = [
   { id: "feed", label: "Feed", icon: HomeIcon, href: "/" },
@@ -30,7 +31,7 @@ function Navigation({ mobile = false, activeItem }: { mobile?: boolean; activeIt
   );
 }
 
-export function Sidebar({ activeItem }: { activeItem: NavItemId }) {
+export function Sidebar({ activeItem, newPostEnabled = false }: { activeItem: NavItemId; newPostEnabled?: boolean }) {
   return (
     <>
       <aside className="sticky top-0 hidden h-screen w-[248px] flex-none flex-col border-r border-[#ECE0D0] bg-[#FFFDF9] px-4 py-6 md:flex">
@@ -43,10 +44,7 @@ export function Sidebar({ activeItem }: { activeItem: NavItemId }) {
             <span className="mt-0.5 block text-[11.5px] text-[#A89A8B]">Sala Soles</span>
           </span>
         </a>
-        <a className="mb-[18px] flex w-full items-center justify-center gap-2 rounded-[14px] bg-gradient-to-b from-[#F4977E] to-[#EE8164] px-3 py-3 text-[14.5px] font-extrabold text-white shadow-[0_8px_18px_-8px_rgba(238,129,100,.75)]" href="#">
-          <PlusIcon size={17} />
-          Nueva publicación
-        </a>
+        <NewPostButton active={newPostEnabled} />
         <Navigation activeItem={activeItem} />
         <div className="mt-[10px] border-t border-[#ECE0D0] pt-[14px]">
           <div className="flex items-center gap-[11px] px-2 py-1.5">
