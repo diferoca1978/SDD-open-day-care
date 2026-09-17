@@ -12,6 +12,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 - Playwright Screenshots y cualquier cosa relacionada con playwright tienen que ir directamente a la carpeta .playwright-mcp.
 - Context7 usaremos este mcp para consultas a la documentacion as actualizada del framework.
+- Supabase MCP: `search_docs` para la documentación oficial, `execute_sql` para iterar SQL, `get_advisors` tras cambios de esquema, `query_logs` para logs. No usar `apply_migration` para iterar (crea una entrada de historial en cada llamada).
 
 ## Commands
 
@@ -29,6 +30,18 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Tailwind CSS v4 with CSS-first config: `@import "tailwindcss"` + `@theme` in `app/globals.css`. There is no `tailwind.config.*` — do not create a v3-style config.
 - Import alias `@/*` maps to the repo root (e.g. `@/app/page.tsx`), not to `src/` or `app/`.
 - Single-package repo. `pnpm-workspace.yaml` only blocks dependency build scripts (`sharp`, `unrs-resolver`) — it is not a monorepo workspace.
+
+## Supabase
+
+- Two skills from `supabase/agent-skills` are installed under `.agents/skills/` and pinned in `skills-lock.json`:
+  - `supabase` — load for ANY Supabase task (Auth, RLS, Edge Functions, Storage, Realtime, CLI, MCP, debugging). Read `.agents/skills/supabase/SKILL.md` before implementing.
+  - `supabase-postgres-best-practices` — load BEFORE writing or changing anything that lives in Postgres (schema, migrations, RLS policies, indexes, triggers, functions). Rules live in `.agents/skills/supabase-postgres-best-practices/references/` (prefixed `query-`, `conn-`, `security-`, `schema-`, `lock-`, `data-`, `monitor-`, `advanced-`).
+- Supabase changes frequently — never rely on training data. Before implementing a Supabase feature, check `https://supabase.com/changelog.md` for breaking changes, then use MCP `search_docs` or fetch docs pages as `.md`.
+- Schema workflow (imperative migrations until `supabase/schemas/` declarative setup exists): iterate freely with MCP `execute_sql` or `supabase db query` (CLI v2.79.0+); when ready to commit, run advisors first (`supabase db advisors` CLI v2.81.3+ or MCP `get_advisors`) and fix findings, then `supabase db pull <name> --local --yes` and verify with `supabase migration list --local`.
+- Discover CLI commands via `--help` — never guess. New hand-authored migrations start with `supabase migration new <name>`.
+- Security checklist (full version in the `supabase` skill): authorization data in `app_metadata`, never `user_metadata` (user-editable); RLS on every table in exposed schemas (includes `public`); views need `WITH (security_invoker = true)`; UPDATE policies need both `USING` and `WITH CHECK`; `TO authenticated` without an ownership predicate is BOLA; `auth.role()` is deprecated — use the policy `TO` clause; avoid `SECURITY DEFINER` (especially in `public` — it bypasses RLS); storage upsert needs INSERT + SELECT + UPDATE grants; never expose `service_role` keys client-side — use publishable keys; pin Supabase package versions and commit lockfiles.
+- Debugging any Supabase error (HTTP, Postgres, PostgREST, RLS surprises, timeouts): fetch `https://supabase.com/docs/guides/monitoring-and-debugging.md` before diagnosing; use MCP `query_logs` for logs.
+- Current state: no `supabase/` directory and no `supabase-js` dependency yet — backend integration not started.
 
 ## Design references (UI source of truth)
 
