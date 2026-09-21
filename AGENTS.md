@@ -12,7 +12,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 - Playwright Screenshots y cualquier cosa relacionada con playwright tienen que ir directamente a la carpeta .playwright-mcp.
 - Context7 usaremos este mcp para consultas a la documentacion as actualizada del framework.
-- Supabase MCP: `search_docs` para la documentación oficial, `execute_sql` para iterar SQL, `get_advisors` tras cambios de esquema, `query_logs` para logs. No usar `apply_migration` para iterar (crea una entrada de historial en cada llamada).
+- Supabase MCP: `search_docs` para la documentación oficial, `execute_sql` para iterar SQL, `get_advisors` tras cambios de esquema, `query_logs` para logs. No usar `apply_migration` para iterar (crea una entrada de historial en cada llamada); usarlo una sola vez cuando el SQL esté validado.
 
 ## Commands
 
@@ -37,11 +37,11 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   - `supabase` — load for ANY Supabase task (Auth, RLS, Edge Functions, Storage, Realtime, CLI, MCP, debugging). Read `.agents/skills/supabase/SKILL.md` before implementing.
   - `supabase-postgres-best-practices` — load BEFORE writing or changing anything that lives in Postgres (schema, migrations, RLS policies, indexes, triggers, functions). Rules live in `.agents/skills/supabase-postgres-best-practices/references/` (prefixed `query-`, `conn-`, `security-`, `schema-`, `lock-`, `data-`, `monitor-`, `advanced-`).
 - Supabase changes frequently — never rely on training data. Before implementing a Supabase feature, check `https://supabase.com/changelog.md` for breaking changes, then use MCP `search_docs` or fetch docs pages as `.md`.
-- Schema workflow (imperative migrations until `supabase/schemas/` declarative setup exists): iterate freely with MCP `execute_sql` or `supabase db query` (CLI v2.79.0+); when ready to commit, run advisors first (`supabase db advisors` CLI v2.81.3+ or MCP `get_advisors`) and fix findings, then `supabase db pull <name> --local --yes` and verify with `supabase migration list --local`.
+- Schema workflow: use MCP `execute_sql` to iterate against the remote database, run `get_advisors`, then call `apply_migration` once with the final SQL. Keep an identical, versioned record under `supabase/migrations/<timestamp>_<name>.sql`; verify the remote history with `supabase_list_migrations`. Do not create a local seed file unless a spec explicitly requires one.
 - Discover CLI commands via `--help` — never guess. New hand-authored migrations start with `supabase migration new <name>`.
 - Security checklist (full version in the `supabase` skill): authorization data in `app_metadata`, never `user_metadata` (user-editable); RLS on every table in exposed schemas (includes `public`); views need `WITH (security_invoker = true)`; UPDATE policies need both `USING` and `WITH CHECK`; `TO authenticated` without an ownership predicate is BOLA; `auth.role()` is deprecated — use the policy `TO` clause; avoid `SECURITY DEFINER` (especially in `public` — it bypasses RLS); storage upsert needs INSERT + SELECT + UPDATE grants; never expose `service_role` keys client-side — use publishable keys; pin Supabase package versions and commit lockfiles.
 - Debugging any Supabase error (HTTP, Postgres, PostgREST, RLS surprises, timeouts): fetch `https://supabase.com/docs/guides/monitoring-and-debugging.md` before diagnosing; use MCP `query_logs` for logs.
-- Current state: no `supabase/` directory and no `supabase-js` dependency yet — backend integration not started.
+- Current state: Supabase remote integration is started. `public.daycares` exists with RLS enabled and no policies, its migration record is `create_daycares_table`, and the matching local record is `supabase/migrations/20260921134235_create_daycares_table.sql`. There is no `supabase-js` client dependency or application wiring yet.
 
 ## Design references (UI source of truth)
 
