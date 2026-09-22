@@ -52,6 +52,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 ## Spec workflow
 
 - Features get a spec before implementation: `specs/NN-slug.md` (none exist yet; first is `01-`), following `.agents/skills/spec/template.md`. New specs must match the language and wording of existing ones.
+- Database-related specs must be created under `specs/db/`.
 - `/spec` writes the spec only — never code. Specs start as `Draft`; the human (not the agent) marks them `Approved`.
 - `/spec-impl` implements an `Approved` spec step by step on a `spec-NN-slug` branch (auto-created unless `AutoCreateBranch: false` in `specs/.spec-config.yml`), pausing after each plan step for diff review; it never commits on its own.
 - Both are user-invoked skills under `.agents/skills/` (`disable-model-invocation`).

@@ -63,7 +63,7 @@ Perfil de aplicación vinculado a **Supabase Auth**. Padres y staff comparten ta
 | `daily_summary_enabled`     | `boolean` default `true` | Resumen diario (19:00).                                                  |
 | `created_at` / `updated_at` | `timestamptz`            |                                                                          |
 
-> **Implementación Supabase:** crear la fila con un trigger `AFTER INSERT` en `auth.users` (función `SECURITY DEFINER`). Pasar `daycare_id`, `role` y `full_name` vía `raw_user_meta_data` en el signup. Activar RLS en esta tabla. No duplicar `email` ni `password_hash` — Supabase ya los gestiona en `auth.users`.
+> **Implementación Supabase:** crear la fila con un trigger `AFTER INSERT` en `auth.users` (función `SECURITY DEFINER`). Pasar `daycare_id` y `full_name` vía `raw_user_meta_data` en el signup; leer `role` desde `raw_app_meta_data` (default `parent`) porque es un dato de autorización. Activar RLS en esta tabla. No duplicar `email` ni `password_hash` — Supabase ya los gestiona en `auth.users`.
 
 ---
 
