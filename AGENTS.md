@@ -30,6 +30,9 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Tailwind CSS v4 with CSS-first config: `@import "tailwindcss"` + `@theme` in `app/globals.css`. There is no `tailwind.config.*` — do not create a v3-style config.
 - Import alias `@/*` maps to the repo root (e.g. `@/app/page.tsx`), not to `src/` or `app/`.
 - Single-package repo. `pnpm-workspace.yaml` only blocks dependency build scripts (`sharp`, `unrs-resolver`) — it is not a monorepo workspace.
+- Supabase database access from Next.js uses the pinned `@supabase/supabase-js` and `@supabase/ssr` packages; do not introduce alternative Supabase clients or direct database drivers.
+- Use `utils/supabase/server.ts` for Server Components, Route Handlers, and other server-side code; use `utils/supabase/client.ts` for browser Client Components.
+- Session cookies are refreshed through `proxy.ts` and `utils/supabase/middleware.ts`; preserve the cookie adapters when adding authenticated server-side data access.
 
 ## Supabase
 
@@ -41,7 +44,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Discover CLI commands via `--help` — never guess. New hand-authored migrations start with `supabase migration new <name>`.
 - Security checklist (full version in the `supabase` skill): authorization data in `app_metadata`, never `user_metadata` (user-editable); RLS on every table in exposed schemas (includes `public`); views need `WITH (security_invoker = true)`; UPDATE policies need both `USING` and `WITH CHECK`; `TO authenticated` without an ownership predicate is BOLA; `auth.role()` is deprecated — use the policy `TO` clause; avoid `SECURITY DEFINER` (especially in `public` — it bypasses RLS); storage upsert needs INSERT + SELECT + UPDATE grants; never expose `service_role` keys client-side — use publishable keys; pin Supabase package versions and commit lockfiles.
 - Debugging any Supabase error (HTTP, Postgres, PostgREST, RLS surprises, timeouts): fetch `https://supabase.com/docs/guides/monitoring-and-debugging.md` before diagnosing; use MCP `query_logs` for logs.
-- Current state: Supabase remote integration is started. `public.daycares` exists with RLS enabled and no policies, its migration record is `create_daycares_table`, and the matching local record is `supabase/migrations/20260921134235_create_daycares_table.sql`. There is no `supabase-js` client dependency or application wiring yet.
+- Current state: Supabase remote integration is started. `public.daycares` exists with RLS enabled and no policies, its migration record is `create_daycares_table`, and the matching local record is `supabase/migrations/20260921134235_create_daycares_table.sql`. The Next.js Supabase clients are available through `utils/supabase/server.ts` and `utils/supabase/client.ts`, with session refresh handled by `proxy.ts`.
 
 ## Design references (UI source of truth)
 
@@ -52,7 +55,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 ## Spec workflow
 
 - Features get a spec before implementation: `specs/NN-slug.md` (none exist yet; first is `01-`), following `.agents/skills/spec/template.md`. New specs must match the language and wording of existing ones.
-- Database-related specs must be created under `specs/db/`.
+- Any spec that involves the database (schema, migrations, RLS, indexes, triggers, functions, or database data) must be created directly under `specs/db/`, never at the root of `specs/`.
 - `/spec` writes the spec only — never code. Specs start as `Draft`; the human (not the agent) marks them `Approved`.
 - `/spec-impl` implements an `Approved` spec step by step on a `spec-NN-slug` branch (auto-created unless `AutoCreateBranch: false` in `specs/.spec-config.yml`), pausing after each plan step for diff review; it never commits on its own.
 - Both are user-invoked skills under `.agents/skills/` (`disable-model-invocation`).
