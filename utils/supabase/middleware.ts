@@ -32,7 +32,35 @@ export const updateSession = async (request: NextRequest) => {
     },
   });
 
-  await supabase.auth.getClaims();
+  const { data } = await supabase.auth.getClaims();
+  const claims = data?.claims;
+  const pathname = request.nextUrl.pathname;
+  const isPublicRoute =
+    pathname.startsWith("/login") || pathname.startsWith("/activate");
+  let redirectPath: string | null = null;
+
+  if (claims && pathname.startsWith("/login")) {
+    redirectPath = "/";
+  } else if (!claims && !isPublicRoute) {
+    redirectPath = "/login";
+  }
+
+  if (redirectPath) {
+    const redirectResponse = NextResponse.redirect(
+      new URL(redirectPath, request.url),
+    );
+
+    supabaseResponse.cookies
+      .getAll()
+      .forEach((cookie) => redirectResponse.cookies.set(cookie));
+
+    for (const header of ["cache-control", "expires", "pragma"]) {
+      const value = supabaseResponse.headers.get(header);
+      if (value) redirectResponse.headers.set(header, value);
+    }
+
+    return redirectResponse;
+  }
 
   return supabaseResponse;
 };

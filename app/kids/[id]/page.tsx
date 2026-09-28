@@ -5,6 +5,7 @@ import { AlertIcon, ChevronLeftIcon, SunIcon } from "@/app/components/icons";
 import { Sidebar } from "@/app/components/sidebar";
 import { kids } from "@/app/data/mock-kids";
 import type { ParentStatus } from "@/app/data/mock-kids";
+import { requireUser } from "@/utils/supabase/require-user";
 
 const parentStatus: Record<ParentStatus, { chip: string; label: string; note: string }> = {
   active: { chip: "bg-[#CFEBD8] text-[#3E9B6C]", label: "ACTIVA", note: "activa" },
@@ -12,6 +13,8 @@ const parentStatus: Record<ParentStatus, { chip: string; label: string; note: st
 };
 
 export default async function KidProfilePage({ params }: PageProps<"/kids/[id]">) {
+  await requireUser();
+
   const { id } = await params;
   const kid = kids.find((kid) => kid.id === id);
 
