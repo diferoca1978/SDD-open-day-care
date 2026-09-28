@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SunIcon } from "@/app/components/icons";
+import { LoginForm } from "@/app/components/login-form";
 
 export default function LoginPage() {
   return (
@@ -31,34 +32,7 @@ export default function LoginPage() {
           <h2 className="m-0 font-heading text-[30px] font-semibold text-[#3F362E]">Iniciar sesión</h2>
           <p className="mb-7 mt-[6px] text-[15px] text-[#94887B]">Ingresá para ver el día de hoy.</p>
 
-          <label className="mb-2 block text-xs font-bold tracking-[.7px] text-[#94887B]" htmlFor="login-email">
-            EMAIL
-          </label>
-          <input
-            className="mb-[18px] w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5 text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B]"
-            id="login-email"
-            placeholder="tu@email.com"
-            type="email"
-          />
-          <label className="mb-2 block text-xs font-bold tracking-[.7px] text-[#94887B]" htmlFor="login-password">
-            CONTRASEÑA
-          </label>
-          <input
-            className="mb-2.5 w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5 text-[15px] text-[#3F362E] outline-none placeholder:text-[#B6A99B]"
-            id="login-password"
-            placeholder="••••••••"
-            type="password"
-          />
-          <div className="mb-5 text-right">
-            <span className="cursor-pointer text-[13.5px] font-bold text-[#C5503A]">¿Olvidaste tu contraseña?</span>
-          </div>
-
-          <a
-            className="block w-full cursor-pointer rounded-[15px] bg-gradient-to-b from-[#F4977E] to-[#EE8164] p-[15px] text-center text-base font-extrabold text-white shadow-[0_10px_22px_-8px_rgba(238,129,100,.7)]"
-            href="#"
-          >
-            Iniciar sesión
-          </a>
+          <LoginForm />
 
           <p className="mt-6 text-center text-[14.5px] text-[#94887B]">
             ¿Te invitó la guardería?{" "}

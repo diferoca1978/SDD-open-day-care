@@ -1,8 +1,11 @@
 import { KidsList } from "@/app/components/kids-list";
 import { Sidebar } from "@/app/components/sidebar";
 import { AddKidDialog } from "@/app/components/add-kid-dialog";
+import { requireUser } from "@/utils/supabase/require-user";
 
-export default function KidsPage() {
+export default async function KidsPage() {
+  await requireUser();
+
   return (
     <div className="flex min-h-screen bg-[#F6ECDF]">
       <Sidebar activeItem="kids" />

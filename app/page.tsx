@@ -2,8 +2,11 @@ import { CameraIcon } from "@/app/components/icons";
 import { FeedPost } from "@/app/components/feed-post";
 import { Sidebar } from "@/app/components/sidebar";
 import { currentUser, posts, room } from "@/app/data/mock-feed";
+import { requireUser } from "@/utils/supabase/require-user";
 
-export default function Home() {
+export default async function Home() {
+  await requireUser();
+
   return (
     <div className="flex min-h-screen bg-[#F6ECDF]">
       <Sidebar activeItem="feed" newPostEnabled />

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { currentUser } from "@/app/data/mock-feed";
 import { BellIcon, HomeIcon, LogoutIcon, PeopleIcon, SunIcon, UserIcon } from "@/app/components/icons";
 import { NewPostButton } from "@/app/components/create-post-dialog";
+import { signOut } from "@/app/actions/auth";
 
 const navItems = [
   { id: "feed", label: "Feed", icon: HomeIcon, href: "/" },
@@ -53,7 +54,11 @@ export function Sidebar({ activeItem, newPostEnabled = false }: { activeItem: Na
               <span className="block truncate text-sm font-extrabold text-[#3F362E]">{currentUser.name}</span>
               <span className="block text-xs text-[#A89A8B]">{currentUser.role} · {currentUser.room}</span>
             </span>
-            <a aria-label="Cerrar sesión" className="flex h-8 w-8 flex-none items-center justify-center rounded-[10px] bg-[#F6ECDF] text-[#94887B]" href="#"><LogoutIcon size={16} /></a>
+            <form action={signOut} className="flex-none">
+              <button aria-label="Cerrar sesión" className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[#F6ECDF] text-[#94887B]" type="submit">
+                <LogoutIcon size={16} />
+              </button>
+            </form>
           </div>
         </div>
       </aside>
