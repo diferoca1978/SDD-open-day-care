@@ -1,30 +1,68 @@
-import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { LinkParentDialog } from "@/app/components/link-parent-dialog";
 import { AlertIcon, ChevronLeftIcon, SunIcon } from "@/app/components/icons";
 import { Sidebar } from "@/app/components/sidebar";
-import { kids } from "@/app/data/mock-kids";
-import type { ParentStatus } from "@/app/data/mock-kids";
+import { buildViewChild } from "@/app/utils/child-view";
 import { requireUser } from "@/utils/supabase/require-user";
-
-const parentStatus: Record<ParentStatus, { chip: string; label: string; note: string }> = {
-  active: { chip: "bg-[#CFEBD8] text-[#3E9B6C]", label: "ACTIVA", note: "activa" },
-  pending: { chip: "bg-[#F7E7A6] text-[#9A7B1E]", label: "PENDIENTE", note: "invitación enviada" },
-};
+import { createClient } from "@/utils/supabase/server";
 
 export default async function KidProfilePage({ params }: PageProps<"/kids/[id]">) {
   await requireUser();
 
   const { id } = await params;
-  const kid = kids.find((kid) => kid.id === id);
+  const supabase = createClient(await cookies());
+  const { data: childRows, error: childError } = await supabase
+    .from("children")
+    .select(
+      "id, room_id, full_name, birth_date, enrolled_at, medical_notes, allergy_tags",
+    )
+    .eq("id", id)
+    .eq("status", "active")
+    .limit(1);
 
-  if (!kid) {
+  if (childError) {
+    throw childError;
+  }
+
+  const child = childRows?.[0];
+  if (!child) {
     notFound();
   }
 
+  const { data: roomRows, error: roomError } = await supabase
+    .from("rooms")
+    .select("id, name")
+    .eq("id", child.room_id)
+    .limit(1);
+
+  if (roomError) {
+    throw roomError;
+  }
+
+  const room = roomRows?.[0];
+  if (!room) {
+    notFound();
+  }
+
+  const kid = buildViewChild(
+    {
+      id: child.id,
+      room_id: child.room_id,
+      full_name: child.full_name,
+      birth_date: child.birth_date,
+      enrolled_at: child.enrolled_at,
+      allergy_tags: child.allergy_tags,
+    },
+    room.name,
+  );
+  const medicalNotes =
+    typeof child.medical_notes === "string" ? child.medical_notes.trim() : "";
+
   const dataRows = [
     { label: "Fecha de nacimiento", value: kid.birthDateLabel },
-    { label: "Sala", value: kid.room },
+    { label: "Sala", value: kid.roomName },
     { label: "Ingreso", value: kid.entryLabel },
   ];
 
@@ -44,22 +82,40 @@ export default async function KidProfilePage({ params }: PageProps<"/kids/[id]">
                   className="flex h-[84px] w-[84px] flex-none items-center justify-center rounded-full font-heading text-[34px] font-semibold"
                   style={{ backgroundColor: kid.avatarColor, color: kid.avatarTextColor }}
                 >
-                  {kid.name.charAt(0)}
+                  {kid.fullName.charAt(0)}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <h1 className="m-0 font-heading text-[28px] font-semibold leading-[normal] text-[#3F362E]">{kid.name}</h1>
-                  <p className="mt-[3px] text-[15px] text-[#94887B]">{kid.ageLabel} · Sala {kid.room}</p>
+                  <h1 className="m-0 font-heading text-[28px] font-semibold leading-[normal] text-[#3F362E]">{kid.fullName}</h1>
+                  <p className="mt-[3px] text-[15px] text-[#94887B]">{kid.ageLabel} · Sala {kid.roomName}</p>
                 </div>
                 <a className="flex-none rounded-[12px] border-[1.5px] border-[#ECE0D0] bg-[#FFFDF9] px-4 py-[9px] text-sm font-bold text-[#6E6359]" href="#">Editar</a>
               </div>
-              {kid.allergyNotes && (
+              {(medicalNotes || kid.allergyLabels.length > 0) && (
                 <div className="flex gap-3.5 rounded-2xl bg-[#FBDAD6] px-[18px] py-4">
                   <span className="flex h-10 w-10 flex-none items-center justify-center rounded-[11px] bg-[#F4A8A0] text-white">
                     <AlertIcon size={22} />
                   </span>
                   <div>
                     <div className="mb-0.5 text-[15px] font-extrabold text-[#C5413A]">Alergias y notas</div>
-                    <p className="m-0 text-[14.5px] leading-[1.5] text-[#B25249]">{kid.allergyNotes}</p>
+                    {medicalNotes ? (
+                      <p className="m-0 text-[14.5px] leading-[1.5] text-[#B25249]">{medicalNotes}</p>
+                    ) : (
+                      <p className="m-0 text-[14.5px] leading-[1.5] text-[#B25249]">
+                        Alergias: {kid.allergyLabels.join(", ")}
+                      </p>
+                    )}
+                    {medicalNotes && kid.allergyLabels.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {kid.allergyLabels.map((allergy) => (
+                          <span
+                            className="rounded-full bg-[#F4A8A0] px-[9px] py-[5px] text-[11px] font-extrabold text-[#9E3D37]"
+                            key={allergy}
+                          >
+                            {allergy}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -83,25 +139,7 @@ export default async function KidProfilePage({ params }: PageProps<"/kids/[id]">
               <div className="rounded-2xl border border-[#ECE0D0] bg-[#FFFDF9] px-[18px] py-4">
                 <div className="mb-3.5 text-[12.5px] font-extrabold tracking-[.8px] text-[#8A7C6D]">PADRES VINCULADOS</div>
                 <div className="flex flex-col gap-3.5">
-                  {kid.parents.map((parent) => {
-                    const status = parentStatus[parent.status];
-                    return (
-                      <div className="flex items-center gap-3" key={parent.name}>
-                        <span
-                          className="flex h-10 w-10 flex-none items-center justify-center rounded-full font-heading text-base font-semibold text-white"
-                          style={{ backgroundColor: parent.avatarColor }}
-                        >
-                          {parent.name.charAt(0)}
-                        </span>
-                        <span className="min-w-0 flex-1">
-                          <span className="block text-[14.5px] font-extrabold text-[#3F362E]">{parent.name}</span>
-                          <span className="block text-[12.5px] text-[#A89A8B]">{parent.role} · {status.note}</span>
-                        </span>
-                        <span className={`flex-none rounded-full px-[9px] py-1 text-[10.5px] font-extrabold ${status.chip}`}>{status.label}</span>
-                      </div>
-                    );
-                  })}
-                  <LinkParentDialog kidName={kid.name} />
+                  <LinkParentDialog kidName={kid.fullName} />
                 </div>
               </div>
             </div>
