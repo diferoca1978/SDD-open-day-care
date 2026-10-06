@@ -90,18 +90,23 @@ the exact reason.
 Use these sections:
 
 ### Result
+
 State whether all criteria pass, partially pass, or are blocked.
 
 ### Acceptance Criteria
+
 List every criterion with `PASS`, `FAIL`, or `BLOCKED`, plus concise evidence.
 
 ### Changes
+
 List implementation and spec files changed, or state that no changes were
 needed.
 
 ### Verification
+
 List commands, URLs, viewports, screenshots, Context7 references, and console
 results used.
 
 ### Remaining Risks
+
 List only real unresolved risks or verification gaps.

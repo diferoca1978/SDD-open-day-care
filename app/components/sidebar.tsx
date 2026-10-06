@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { BellIcon, HomeIcon, LogoutIcon, PeopleIcon, SunIcon, UserIcon } from "@/app/components/icons";
-import { NewPostButton } from "@/app/components/create-post-dialog";
+import { NewPostButton, type PostAudienceChild, type PostAudienceRoom } from "@/app/components/create-post-dialog";
 import { signOut } from "@/app/actions/auth";
 import { requireUser } from "@/utils/supabase/require-user";
 import { createClient } from "@/utils/supabase/server";
@@ -45,6 +45,18 @@ export async function Sidebar({ activeItem, newPostEnabled = false }: { activeIt
 
   const name = profile?.full_name || "Usuario";
   const role = profile?.role === "staff" ? "Maestra" : profile?.role === "admin" ? "Administradora" : "Padre";
+  const canPublish = profile?.role === "staff" || profile?.role === "admin";
+  let audienceChildren: PostAudienceChild[] = [];
+  let audienceRooms: PostAudienceRoom[] = [];
+
+  if (newPostEnabled && canPublish) {
+    const [roomsResult, childrenResult] = await Promise.all([
+      supabase.from("rooms").select("id, name").order("created_at", { ascending: true }),
+      supabase.from("children").select("id, full_name").eq("status", "active").order("full_name", { ascending: true }),
+    ]);
+    audienceRooms = (roomsResult.data ?? []).map((room) => ({ id: room.id, name: room.name }));
+    audienceChildren = (childrenResult.data ?? []).map((child) => ({ id: child.id, fullName: child.full_name }));
+  }
 
   return (
     <>
@@ -58,7 +70,7 @@ export async function Sidebar({ activeItem, newPostEnabled = false }: { activeIt
             <span className="mt-0.5 block text-[11.5px] text-[#A89A8B]">Sala Soles</span>
           </span>
         </a>
-        <NewPostButton active={newPostEnabled} />
+        <NewPostButton active={newPostEnabled && canPublish} audienceChildren={audienceChildren} rooms={audienceRooms} />
         <Navigation activeItem={activeItem} />
         <div className="mt-[10px] border-t border-[#ECE0D0] pt-[14px]">
           <div className="flex items-center gap-[11px] px-2 py-1.5">
