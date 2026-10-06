@@ -39,9 +39,9 @@ export const updateSession = async (request: NextRequest) => {
     pathname.startsWith("/login") || pathname.startsWith("/activate");
   let redirectPath: string | null = null;
 
-  if (claims && pathname.startsWith("/login")) {
-    redirectPath = "/";
-  } else if (!claims && !isPublicRoute) {
+  // Always allow access to /login and /activate (public routes)
+  // The signIn action handles closing any existing session
+  if (!claims && !isPublicRoute) {
     redirectPath = "/login";
   }
 

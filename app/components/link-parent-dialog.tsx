@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useActionState } from "react";
 import { InfoIcon, PlusIcon, SendIcon, XIcon } from "@/app/components/icons";
 import { parentRoles } from "@/app/data/parent-roles";
+import { sendInvitation, type SendInvitationState } from "@/app/actions/invitations";
 
 const labelClassName = "mb-2 block text-xs font-extrabold tracking-[.7px] text-[#94887B]";
 const fieldClassName =
@@ -15,16 +16,25 @@ type FormErrors = {
 };
 
 type LinkParentDialogProps = {
+  kidId: string;
   kidName: string;
 };
 
-export function LinkParentDialog({ kidName }: LinkParentDialogProps) {
+const initialState: SendInvitationState = {
+  error: null,
+  invitationId: null,
+  code: null,
+};
+
+export function LinkParentDialog({ kidId, kidName }: LinkParentDialogProps) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<(typeof parentRoles)[number]>(parentRoles[0]);
   const [errors, setErrors] = useState<FormErrors>({});
   const firstName = kidName.trim().split(/\s+/)[0] || kidName;
+
+  const [state, formAction, isPending] = useActionState(sendInvitation, initialState);
 
   const closeDialog = useCallback(() => {
     setOpen(false);
@@ -47,7 +57,7 @@ export function LinkParentDialog({ kidName }: LinkParentDialogProps) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [closeDialog, open]);
 
-  function handleSubmit() {
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     const nextErrors: FormErrors = {};
     if (!name.trim()) {
       nextErrors.name = "Ingresa el nombre del padre o madre.";
@@ -58,8 +68,9 @@ export function LinkParentDialog({ kidName }: LinkParentDialogProps) {
       nextErrors.email = "Ingresa un email válido.";
     }
     setErrors(nextErrors);
-    if (!nextErrors.name && !nextErrors.email) {
-      closeDialog();
+
+    if (nextErrors.name || nextErrors.email) {
+      event.preventDefault();
     }
   }
 
@@ -110,74 +121,89 @@ export function LinkParentDialog({ kidName }: LinkParentDialogProps) {
                 </span>
               </div>
 
-              <div className="mb-[18px]">
-                <label className={labelClassName} htmlFor="parent-name">
-                  NOMBRE DEL PADRE/MADRE
-                </label>
-                <input
-                  aria-describedby={errors.name ? "parent-name-error" : undefined}
-                  aria-invalid={Boolean(errors.name)}
-                  className={`${fieldClassName} ${errors.name ? "border-[#C5413A]" : ""}`}
-                  id="parent-name"
-                  onChange={(event) => setName(event.target.value)}
-                  placeholder="Ej. Diego Fernández"
-                  type="text"
-                  value={name}
-                />
-                {errors.name && <p className={errorMessageClassName} id="parent-name-error">{errors.name}</p>}
-              </div>
-              <div className="mb-[18px]">
-                <label className={labelClassName} htmlFor="parent-email">
-                  EMAIL
-                </label>
-                <input
-                  aria-describedby={errors.email ? "parent-email-error" : undefined}
-                  aria-invalid={Boolean(errors.email)}
-                  className={`${fieldClassName} ${errors.email ? "border-[#C5413A]" : ""}`}
-                  id="parent-email"
-                  onChange={(event) => setEmail(event.target.value)}
-                  placeholder="correo@ejemplo.com"
-                  type="email"
-                  value={email}
-                />
-                {errors.email && <p className={errorMessageClassName} id="parent-email-error">{errors.email}</p>}
-              </div>
+              <form action={formAction} onSubmit={handleSubmit}>
+                <input type="hidden" name="childId" value={kidId} />
+                <input type="hidden" name="parentRole" value={role} />
 
-              <div className="mb-5">
-                <div className={`${labelClassName} mb-2.5`}>PARENTESCO</div>
-                <div className="flex gap-[9px]">
-                  {parentRoles.map((parentRole, index) => (
-                    <button
-                      aria-pressed={role === parentRoles[index]}
-                      className={`flex-1 rounded-full border-[1.5px] px-[11px] py-[11px] text-sm font-extrabold ${
-                        role === parentRoles[index]
-                          ? "border-[#9FB8EC] bg-[#CCD8F4] text-[#4E72C8]"
-                          : "border-[#ECE0D0] bg-[#FFFDF9] text-[#6E6359]"
-                      }`}
-                      key={parentRole}
-                      onClick={() => setRole(parentRoles[index])}
-                      type="button"
-                    >
-                      {parentRole}
-                    </button>
-                  ))}
+                <div className="mb-[18px]">
+                  <label className={labelClassName} htmlFor="parent-name">
+                    NOMBRE DEL PADRE/MADRE
+                  </label>
+                  <input
+                    aria-describedby={errors.name ? "parent-name-error" : undefined}
+                    aria-invalid={Boolean(errors.name)}
+                    className={`${fieldClassName} ${errors.name ? "border-[#C5413A]" : ""}`}
+                    id="parent-name"
+                    name="parentName"
+                    onChange={(event) => setName(event.target.value)}
+                    placeholder="Ej. Diego Fernández"
+                    type="text"
+                    value={name}
+                  />
+                  {errors.name && <p className={errorMessageClassName} id="parent-name-error">{errors.name}</p>}
                 </div>
-              </div>
+                <div className="mb-[18px]">
+                  <label className={labelClassName} htmlFor="parent-email">
+                    EMAIL
+                  </label>
+                  <input
+                    aria-describedby={errors.email ? "parent-email-error" : undefined}
+                    aria-invalid={Boolean(errors.email)}
+                    className={`${fieldClassName} ${errors.email ? "border-[#C5413A]" : ""}`}
+                    id="parent-email"
+                    name="parentEmail"
+                    onChange={(event) => setEmail(event.target.value)}
+                    placeholder="correo@ejemplo.com"
+                    type="email"
+                    value={email}
+                  />
+                  {errors.email && <p className={errorMessageClassName} id="parent-email-error">{errors.email}</p>}
+                </div>
 
-              <div className="mb-5 rounded-2xl border-[1.5px] border-dashed border-[#E6D08A] bg-[#FBF1D6] p-[18px] text-center">
-                <div className="mb-2 text-xs font-extrabold tracking-[.7px] text-[#A88526]">CÓDIGO DE INVITACIÓN</div>
-                <div className="font-heading text-[34px] font-semibold tracking-[7px] text-[#8A7234]">7K4P9</div>
-                <div className="mt-1.5 text-[13px] text-[#A88526]">Vence en 7 días</div>
-              </div>
+                <div className="mb-5">
+                  <div className={`${labelClassName} mb-2.5`}>PARENTESCO</div>
+                  <div className="flex gap-[9px]">
+                    {parentRoles.map((parentRole, index) => (
+                      <button
+                        aria-pressed={role === parentRoles[index]}
+                        className={`flex-1 rounded-full border-[1.5px] px-[11px] py-[11px] text-sm font-extrabold ${
+                          role === parentRoles[index]
+                            ? "border-[#9FB8EC] bg-[#CCD8F4] text-[#4E72C8]"
+                            : "border-[#ECE0D0] bg-[#FFFDF9] text-[#6E6359]"
+                        }`}
+                        key={parentRole}
+                        onClick={() => setRole(parentRoles[index])}
+                        type="button"
+                      >
+                        {parentRole}
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-              <button
-                className="flex w-full items-center justify-center gap-[9px] rounded-[14px] bg-gradient-to-b from-[#F4977E] to-[#EE8164] py-3.5 text-[15.5px] font-extrabold text-white shadow-[0_10px_22px_-8px_rgba(238,129,100,.7)]"
-                onClick={handleSubmit}
-                type="button"
-              >
-                <SendIcon size={19} />
-                Enviar invitación
-              </button>
+                {state.code && (
+                  <div className="mb-5 rounded-2xl border-[1.5px] border-dashed border-[#E6D08A] bg-[#FBF1D6] p-[18px] text-center">
+                    <div className="mb-2 text-xs font-extrabold tracking-[.7px] text-[#A88526]">CÓDIGO DE INVITACIÓN</div>
+                    <div className="font-heading text-[34px] font-semibold tracking-[7px] text-[#8A7234]">{state.code}</div>
+                    <div className="mt-1.5 text-[13px] text-[#A88526]">Vence en 7 días</div>
+                  </div>
+                )}
+
+                {state.error && (
+                  <div className="mb-5 rounded-[14px] bg-[#FDE8E8] px-4 py-3 text-[13.5px] font-bold text-[#C5413A]">
+                    {state.error}
+                  </div>
+                )}
+
+                <button
+                  className="flex w-full items-center justify-center gap-[9px] rounded-[14px] bg-gradient-to-b from-[#F4977E] to-[#EE8164] py-3.5 text-[15.5px] font-extrabold text-white shadow-[0_10px_22px_-8px_rgba(238,129,100,.7)] disabled:opacity-50"
+                  disabled={isPending}
+                  type="submit"
+                >
+                  <SendIcon size={19} />
+                  {isPending ? "Enviando..." : "Enviar invitación"}
+                </button>
+              </form>
             </div>
           </div>
         </div>

@@ -1,8 +1,10 @@
 import Link from "next/link";
-import { currentUser } from "@/app/data/mock-feed";
 import { BellIcon, HomeIcon, LogoutIcon, PeopleIcon, SunIcon, UserIcon } from "@/app/components/icons";
 import { NewPostButton } from "@/app/components/create-post-dialog";
 import { signOut } from "@/app/actions/auth";
+import { requireUser } from "@/utils/supabase/require-user";
+import { createClient } from "@/utils/supabase/server";
+import { cookies } from "next/headers";
 
 const navItems = [
   { id: "feed", label: "Feed", icon: HomeIcon, href: "/" },
@@ -32,7 +34,18 @@ function Navigation({ mobile = false, activeItem }: { mobile?: boolean; activeIt
   );
 }
 
-export function Sidebar({ activeItem, newPostEnabled = false }: { activeItem: NavItemId; newPostEnabled?: boolean }) {
+export async function Sidebar({ activeItem, newPostEnabled = false }: { activeItem: NavItemId; newPostEnabled?: boolean }) {
+  const claims = await requireUser();
+  const supabase = createClient(await cookies());
+  const { data: profile } = await supabase
+    .from("users")
+    .select("full_name, role")
+    .eq("id", claims.sub)
+    .single();
+
+  const name = profile?.full_name || "Usuario";
+  const role = profile?.role === "staff" ? "Maestra" : profile?.role === "admin" ? "Administradora" : "Padre";
+
   return (
     <>
       <aside className="sticky top-0 hidden h-screen w-[248px] flex-none flex-col border-r border-[#ECE0D0] bg-[#FFFDF9] px-4 py-6 md:flex">
@@ -49,10 +62,10 @@ export function Sidebar({ activeItem, newPostEnabled = false }: { activeItem: Na
         <Navigation activeItem={activeItem} />
         <div className="mt-[10px] border-t border-[#ECE0D0] pt-[14px]">
           <div className="flex items-center gap-[11px] px-2 py-1.5">
-            <span className="flex h-[38px] w-[38px] flex-none items-center justify-center rounded-full bg-[#F2937A] font-heading text-base font-semibold text-white">{currentUser.initial}</span>
+            <span className="flex h-[38px] w-[38px] flex-none items-center justify-center rounded-full bg-[#F2937A] font-heading text-base font-semibold text-white">{name.charAt(0).toUpperCase()}</span>
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-sm font-extrabold text-[#3F362E]">{currentUser.name}</span>
-              <span className="block text-xs text-[#A89A8B]">{currentUser.role} · {currentUser.room}</span>
+              <span className="block truncate text-sm font-extrabold text-[#3F362E]">{name}</span>
+              <span className="block text-xs text-[#A89A8B]">{role} · Soles</span>
             </span>
             <form action={signOut} className="flex-none">
               <button aria-label="Cerrar sesión" className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[#F6ECDF] text-[#94887B]" type="submit">
