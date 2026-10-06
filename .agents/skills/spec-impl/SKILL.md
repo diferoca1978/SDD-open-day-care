@@ -99,7 +99,27 @@ Do not offer alternatives, do not suggest "I can still start if you want". The b
 
 ---
 
-### Phase 3 — Create the git branch and switch to it
+### Phase 3 — Database migrations (if applicable)
+
+**This phase only applies to DB specs.** Check if the spec file is located under `specs/db/`. If it is, the spec involves database changes (schema, migrations, RLS, indexes, triggers, functions, or database data).
+
+When the spec is a DB spec, invoke the `@db-migrator` subagent **before** proceeding to Phase 4. Tell the user:
+
+```
+This spec involves database changes. I am going to run the db-migrator agent
+to validate existing migrations and apply any pending ones before we start
+implementing.
+```
+
+Then invoke `@db-migrator` with the task tool, passing the spec path so the agent has context about what database changes are expected. Wait for the agent to complete its validation and application phases.
+
+If the db-migrator reports issues (failed migrations, missing files, security advisories), pause and show the user the report before continuing. Do not proceed to implementation until the migration state is clean.
+
+If the spec is **not** under `specs/db/`, skip this phase entirely.
+
+---
+
+### Phase 4 — Create the git branch and switch to it
 
 Once you have confirmed the state means `Approved`:
 
@@ -216,9 +236,10 @@ in your repo's language) and make the final commit before merging this branch.
 
   Phase 1  →  Finds specs/01-mvp-arkanoid.md
   Phase 2  →  Reads the state → "Approved" (or "Aprobado", etc.) → ✅ continues
-  Phase 3  →  git checkout -b spec-01-mvp-arkanoid → git checkout spec-01-mvp-arkanoid
+  Phase 3  →  DB spec? Run @db-migrator to validate/apply migrations → ✅ continues
+  Phase 4  →  git checkout -b spec-01-mvp-arkanoid → git checkout spec-01-mvp-arkanoid
               Shows objective, scope, plan and criteria
-  Phase 4  →  Implements step by step with pauses
+  Phase 5  →  Implements step by step with pauses
               Ends by reminding to verify the acceptance criteria
 
 /spec-impl 02-powerups  (state: Draft / Borrador)
@@ -229,4 +250,4 @@ in your repo's language) and make the final commit before merging this branch.
               Does not create branch, does not touch code
 ```
 
-**Branch creation is controlled by the `AutoCreateBranch` flag** in `specs/.spec-config.yml`. It defaults to `true` (create the branch automatically, as shown above). Set it to `false` to make Phase 3 ask `[y/N]` before creating the branch.
+**Branch creation is controlled by the `AutoCreateBranch` flag** in `specs/.spec-config.yml`. It defaults to `true` (create the branch automatically, as shown above). Set it to `false` to make Phase 4 ask `[y/N]` before creating the branch.

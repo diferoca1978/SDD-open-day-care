@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@/app/components/icons";
 
 interface PokemonType {
@@ -62,28 +62,42 @@ export function PokemonViewer() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchPokemon = useCallback(async (pokemonId: number) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`);
-      if (!res.ok) throw new Error("No se encontró este Pokémon.");
-      const data: Pokemon = await res.json();
-      setPokemon(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error desconocido.");
-      setPokemon(null);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
-    fetchPokemon(id);
-  }, [id, fetchPokemon]);
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+        if (!res.ok) throw new Error("No se encontró este Pokémon.");
+        const data: Pokemon = await res.json();
+        if (!cancelled) {
+          setPokemon(data);
+          setError(null);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : "Error desconocido.");
+          setPokemon(null);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
 
-  const goPrev = () => setId((prev) => Math.max(1, prev - 1));
-  const goNext = () => setId((prev) => prev + 1);
+  const goPrev = () => {
+    setLoading(true);
+    setId((prev) => Math.max(1, prev - 1));
+  };
+  const goNext = () => {
+    setLoading(true);
+    setId((prev) => prev + 1);
+  };
 
   return (
     <div className="flex min-h-screen flex-col items-center px-4 py-8">

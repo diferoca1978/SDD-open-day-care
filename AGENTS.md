@@ -60,6 +60,13 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - `/spec-impl` implements an `Approved` spec step by step on a `spec-NN-slug` branch (auto-created unless `AutoCreateBranch: false` in `specs/.spec-config.yml`), pausing after each plan step for diff review; it never commits on its own.
 - Both are user-invoked skills under `.agents/skills/` (`disable-model-invocation`).
 
+## Database migrations (`@db-migrator`)
+
+- A dedicated subagent (`.opencode/agents/db-migrator.md`) handles the full migration lifecycle: **validate**, **create** (if missing), and **apply**.
+- It is invoked automatically by `/spec-impl` before implementation when the spec is under `specs/db/`. It can also be invoked manually with `@db-migrator`.
+- Workflow: verify local files match remote history → generate missing migration files with `supabase db pull` → validate SQL against security checklist → apply pending migrations with `apply_migration` (once per migration) → run `get_advisors` to confirm no issues.
+- Never use `apply_migration` to iterate SQL — it creates a history entry on every call. Use `execute_sql` (MCP) for iteration, then `apply_migration` once when the SQL is final.
+
 ## Coding rules
 
 - _Always_ use clean code.
