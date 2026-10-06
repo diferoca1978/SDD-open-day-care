@@ -1,7 +1,25 @@
 import Link from "next/link";
 import { SunIcon } from "@/app/components/icons";
+import { ActivateForm } from "@/app/components/activate-form";
+import { getInvitationByCode } from "@/app/actions/activate";
 
-export default function ActivatePage() {
+type ActivatePageProps = {
+  searchParams: Promise<{ code?: string }>;
+};
+
+export default async function ActivatePage({ searchParams }: ActivatePageProps) {
+  const { code } = await searchParams;
+
+  let invitation = null;
+  let codeError: string | null = null;
+
+  if (code) {
+    invitation = await getInvitationByCode(code);
+    if (!invitation) {
+      codeError = "Código de invitación no válido o expirado.";
+    }
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#FBF4EC] p-10">
       <div className="w-full max-w-[440px]">
@@ -15,61 +33,81 @@ export default function ActivatePage() {
           Te invitaron a seguir el día de tu hijo. Creá tu contraseña para activar la cuenta.
         </p>
 
-        <div className="mb-[22px] flex items-center gap-3.5 rounded-2xl border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5">
-          <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-[#A9D9E8] font-heading text-[19px] font-semibold text-[#1F7A93]">
-            M
-          </span>
-          <div>
-            <div className="text-[13px] text-[#94887B]">Te invitaron a seguir a</div>
-            <div className="font-heading text-[17px] font-semibold text-[#3F362E]">Mateo · Sala Soles</div>
+        {codeError && (
+          <div className="mb-[22px] rounded-[14px] bg-[#FDE8E8] px-4 py-3 text-[13.5px] font-bold text-[#C5413A]">
+            {codeError}
           </div>
-        </div>
+        )}
 
-        <label className="mb-2 block text-xs font-bold tracking-[.7px] text-[#94887B]" htmlFor="activate-code">
-          CÓDIGO DE INVITACIÓN
-        </label>
-        <input
-          className="mb-[18px] w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5 font-heading text-[18px] font-bold tracking-[3px] text-[#3F362E] outline-none"
-          defaultValue="7K4P9"
-          id="activate-code"
-          type="text"
-        />
-        <label className="mb-2 block text-xs font-bold tracking-[.7px] text-[#94887B]" htmlFor="activate-email">
-          EMAIL
-        </label>
-        <input
-          className="mb-[18px] w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5 text-[15px] text-[#3F362E] outline-none"
-          defaultValue="lucia.fernandez@gmail.com"
-          id="activate-email"
-          type="email"
-        />
-        <label className="mb-2 block text-xs font-bold tracking-[.7px] text-[#94887B]" htmlFor="activate-password">
-          CREAR CONTRASEÑA
-        </label>
-        <input
-          className="mb-[18px] w-full rounded-[14px] border-[1.5px] border-[#F2A78E] bg-white px-4 py-3.5 text-[15px] text-[#3F362E] outline-none"
-          defaultValue="contraseña"
-          id="activate-password"
-          type="password"
-        />
+        {invitation && (
+          <div className="mb-[22px] flex items-center gap-3.5 rounded-2xl border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5">
+            <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-[#A9D9E8] font-heading text-[19px] font-semibold text-[#1F7A93]">
+              {invitation.childName.charAt(0)}
+            </span>
+            <div>
+              <div className="text-[13px] text-[#94887B]">Te invitaron a seguir a</div>
+              <div className="font-heading text-[17px] font-semibold text-[#3F362E]">
+                {invitation.childName} · {invitation.daycareName}
+              </div>
+            </div>
+          </div>
+        )}
 
-        <div className="mb-6 flex items-start gap-3 rounded-[14px] bg-[#FBF1D6] px-4 py-3.5">
-          <span className="mt-px flex h-6 w-6 flex-none items-center justify-center rounded-lg bg-[#5FB97E] text-white">
-            <svg aria-hidden="true" fill="none" height="15" viewBox="0 0 24 24" width="15" xmlns="http://www.w3.org/2000/svg">
-              <polyline points="20 6 9 17 4 12" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" />
-            </svg>
-          </span>
-          <span className="text-sm leading-[1.45] text-[#8A7234]">
-            Autorizo a la guardería a tomar y compartir fotos de mi hijo dentro de la app.
-          </span>
-        </div>
+        {!code && (
+          <>
+            <label className="mb-2 block text-xs font-bold tracking-[.7px] text-[#94887B]" htmlFor="activate-code">
+              CÓDIGO DE INVITACIÓN
+            </label>
+            <input
+              className="mb-[18px] w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5 font-heading text-[18px] font-bold tracking-[3px] text-[#3F362E] outline-none"
+              defaultValue="7K4P9"
+              id="activate-code"
+              readOnly
+              type="text"
+            />
+            <label className="mb-2 block text-xs font-bold tracking-[.7px] text-[#94887B]" htmlFor="activate-email">
+              EMAIL
+            </label>
+            <input
+              className="mb-[18px] w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-3.5 text-[15px] text-[#3F362E] outline-none"
+              defaultValue="lucia.fernandez@gmail.com"
+              id="activate-email"
+              readOnly
+              type="email"
+            />
+            <label className="mb-2 block text-xs font-bold tracking-[.7px] text-[#94887B]" htmlFor="activate-password">
+              CREAR CONTRASEÑA
+            </label>
+            <input
+              className="mb-[18px] w-full rounded-[14px] border-[1.5px] border-[#F2A78E] bg-white px-4 py-3.5 text-[15px] text-[#3F362E] outline-none"
+              defaultValue="contraseña"
+              id="activate-password"
+              readOnly
+              type="password"
+            />
 
-        <a
-          className="block w-full rounded-[15px] bg-gradient-to-b from-[#F4977E] to-[#EE8164] p-[15px] text-center text-base font-extrabold text-white shadow-[0_10px_22px_-8px_rgba(238,129,100,.7)]"
-          href="#"
-        >
-          Activar mi cuenta
-        </a>
+            <div className="mb-6 flex items-start gap-3 rounded-[14px] bg-[#FBF1D6] px-4 py-3.5">
+              <span className="mt-px flex h-6 w-6 flex-none items-center justify-center rounded-lg bg-[#5FB97E] text-white">
+                <svg aria-hidden="true" fill="none" height="15" viewBox="0 0 24 24" width="15" xmlns="http://www.w3.org/2000/svg">
+                  <polyline points="20 6 9 17 4 12" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" />
+                </svg>
+              </span>
+              <span className="text-sm leading-[1.45] text-[#8A7234]">
+                Autorizo a la guardería a tomar y compartir fotos de mi hijo dentro de la app.
+              </span>
+            </div>
+
+            <a
+              className="block w-full rounded-[15px] bg-gradient-to-b from-[#F4977E] to-[#EE8164] p-[15px] text-center text-base font-extrabold text-white shadow-[0_10px_22px_-8px_rgba(238,129,100,.7)]"
+              href="#"
+            >
+              Activar mi cuenta
+            </a>
+          </>
+        )}
+
+        {invitation && <ActivateForm code={invitation.code} email={invitation.parentEmail} />}
+
         <p className="mt-[22px] text-center text-[14.5px] text-[#94887B]">
           ¿Ya tenés cuenta?{" "}
           <Link className="font-extrabold text-[#C5503A]" href="/login">

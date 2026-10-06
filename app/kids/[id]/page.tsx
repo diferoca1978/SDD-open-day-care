@@ -139,7 +139,7 @@ export default async function KidProfilePage({ params }: PageProps<"/kids/[id]">
               <div className="rounded-2xl border border-[#ECE0D0] bg-[#FFFDF9] px-[18px] py-4">
                 <div className="mb-3.5 text-[12.5px] font-extrabold tracking-[.8px] text-[#8A7C6D]">PADRES VINCULADOS</div>
                 <div className="flex flex-col gap-3.5">
-                  <LinkParentDialog kidName={kid.fullName} />
+                  <LinkParentDialog kidId={kid.id} kidName={kid.fullName} />
                 </div>
               </div>
             </div>

@@ -15,10 +15,17 @@ export async function signIn(
   const password = formData.get("password");
   const supabase = createClient(await cookies());
 
-  const { error } = await supabase.auth.signInWithPassword({
+  console.log("signIn called with email:", email);
+
+  // Sign out any existing session before signing in
+  await supabase.auth.signOut();
+
+  const { data, error } = await supabase.auth.signInWithPassword({
     email: typeof email === "string" ? email : "",
     password: typeof password === "string" ? password : "",
   });
+
+  console.log("signIn result:", { data: data?.user?.email, error: error?.message });
 
   if (error) {
     return { error: "Email o contraseña incorrectos." };
