@@ -30,6 +30,8 @@ export default async function Home() {
             <p className="mt-[5px] text-[14.5px] text-[#94887B]">{room.childrenCount} niños · martes 17 jun</p>
           </header>
 
+          <Counter />
+
           <a className="mb-6 flex items-center gap-3.5 rounded-[18px] border border-[#ECE0D0] bg-[#FFFDF9] px-[18px] py-3.5 shadow-[0_4px_14px_-10px_rgba(120,90,60,.4)]" href="#">
             <span className="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-[#F2937A] font-heading text-base font-semibold text-white">{displayName.charAt(0).toUpperCase()}</span>
             <span className="flex-1 text-[15px] text-[#A89A8B]">Compartí un momento…</span>
